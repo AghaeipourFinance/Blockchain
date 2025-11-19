@@ -7,7 +7,6 @@ import requests
 from urllib.parse import urlparse
 from flask import request, jsonify , Flask
 
-
 class Blockchain():
     """new blockchain"""
     def __init__(self):
@@ -16,7 +15,6 @@ class Blockchain():
         self.new_block(proof=100 , previous_hash=1)
         self.nodes = set()
 
-    
     def new_block(self , proof ,previous_hash = None ):
         """create new block"""
         block = {'index': len(self.chain) + 1 ,
@@ -34,13 +32,11 @@ class Blockchain():
         self.current_trxs.append({'sender':sender , 'recipient':recipient , 'amount':amount})
         return self.last_block['index'] + 1
     
-
     def register_node(self , address):
         """add a new node to the blockchain"""
         parsed_url = urlparse(address)
         self.nodes.add(parsed_url.netloc)
         
-    
     def valid_chain(self, chain):
         """valid the blockchain"""
         last_block = chain[0]
@@ -128,6 +124,10 @@ def mine():
 def new_trx():
     """add a new trx to the mempool"""
     values = request.get_json()
+    required = ['sender' ,'recipient' , 'amount' ]
+    if not all(k in values for k in required):
+        return "Missing values", 400
+        
     this_block = blockchain.new_trx(values['sender'] , values['recipient'] , values['amount'])
     res = {'message':f'trx will be added to block {this_block}'}
     return jsonify(res) , 201
